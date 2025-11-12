@@ -1,0 +1,60 @@
+[versions]
+bouncy-castle = "1.78"
+coroutines = "1.9.0"
+grpc-kotlin = "1.4.1"
+grpc-protobuf = "1.68.1"
+google-protobuf = "0.9.4"
+google-protobuf-kotlin = "4.28.3"
+jackson = "2.15.2"
+paseto4j = "2024.3"
+kotlin = "2.2.0"
+vertx = "5.0.4"
+
+[libraries]
+# coroutines
+coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+
+# vertx
+vertx-core = { module = "io.vertx:vertx-core", version.ref = "vertx" }
+vertx-grpc-server = { module = "io.vertx:vertx-grpcio-server", version.ref = "vertx" }
+vertx-launcher-application = { module = "io.vertx:vertx-launcher-application", version.ref = "vertx" }
+vertx-coroutines = { module = "io.vertx:vertx-lang-kotlin-coroutines", version.ref = "vertx" }
+vertx-pg-client = { module = "io.vertx:vertx-pg-client", version.ref = "vertx" }
+
+# gRPC Core
+grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc-protobuf" }
+grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc-protobuf" }
+grpc-services = { module = "io.grpc:grpc-services", version.ref = "grpc-protobuf" }
+
+# gRPC kotlin
+grpc-kotlin-stub = { module = "io.grpc:grpc-kotlin-stub", version.ref = "grpc-kotlin" }
+
+# Protocol Buffers
+google-protobuf-kotlin = { module = "com.google.protobuf:protobuf-kotlin", version.ref = "google-protobuf-kotlin" }
+
+# Build tools
+protoc-gen-grpc-java = { module = "io.grpc:protoc-gen-grpc-java", version.ref = "grpc-protobuf" }
+protoc-gen-grpc-kotlin = { module = "io.grpc:protoc-gen-grpc-kotlin", version.ref = "grpc-kotlin" }
+
+# Paseto
+paseto4j = { module = "io.github.nbaars:paseto4j-version4", version.ref = "paseto4j" }
+
+# Bouncy Castle
+bouncy-castle4j = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncy-castle" }
+
+# Jackson
+jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+
+# Testing
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+
+[bundles]
+vertx = ["vertx-core", "vertx-grpc-server", "vertx-launcher-application", "vertx-coroutines", "vertx-pg-client"]
+grpc = ["grpc-netty-shaded", "grpc-protobuf", "grpc-services", "grpc-kotlin-stub"]
+protobuf = ["google-protobuf-kotlin"]
+testing = ["coroutines-test", "kotlin-test"]
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+google-protobuf = { id = "com.google.protobuf", version.ref = "google-protobuf" }

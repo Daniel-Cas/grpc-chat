@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package types.v1;
+
+enum TokenType {
+  LOCAL = 0;
+  PUBLIC = 1;
+}

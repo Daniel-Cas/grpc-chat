@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package chat.v1;
+
+import "type/v1/types.proto";
+
+service ChatService {
+  rpc StreamChat(stream ClientMessage) returns (stream ServerMessage);
+}
+
+message ClientMessage {
+  oneof message {
+    Connect connect = 1;
+    SendText send_text = 2;
+  }
+}
+
+message Connect {
+  string user_id = 1;
+}
+
+message SendText {
+  string message_id = 1;
+  string content = 2;
+}
+
+message ServerMessage {
+  oneof message {
+    Connected connected = 1;
+    TextReceived text_received = 2;
+    Error error = 3;
+  }
+}
+
+message Connected {
+  bool success = 1;
+  string session_id = 2;
+}
+
+message TextReceived {
+  string message_id = 1;
+  string sender_id = 2;
+  string content = 3;
+  types.v1.Timestamp timestamp = 4;
+}
+
+message Error {
+  string code = 1;
+  string message = 2;
+}

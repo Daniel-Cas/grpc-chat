@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package types.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+message Timestamp {
+  google.protobuf.Timestamp value = 1;
+}
+
+message Empty {
+  google.protobuf.Empty value = 1;
+}
