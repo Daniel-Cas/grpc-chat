@@ -1,0 +1,18 @@
+auth:
+  paseto:
+    audience: "${PASETO_AUDIENCE:grpc-chat-api}"
+    issuer: ${PASETO_ISSUER:grpc-chat}
+    public-key: ${PASETO_PUBLIC_KEY:MCowBQYDK2VwAyEAXrJSLf9z8Y8pN3qK5mH2wT1vR4xE6nU9cF7bA8sD2gI=}
+    symmetric-key: ${PASETO_SYMMETRIC_KEY:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=}
+
+
+database:
+  postgres:
+    host: localhost
+    port: 5432
+
+grpc:
+  port: 9090
+
+server:
+  port: 8080

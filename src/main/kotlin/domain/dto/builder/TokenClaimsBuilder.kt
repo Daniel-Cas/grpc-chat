@@ -28,13 +28,13 @@ class TokenClaimsBuilder {
         require(subject.isNotBlank()) { "Subject cannot be empty" }
         require(audience.isNotBlank()) { "Audience cannot be empty" }
 
-        val expiration = issuedAt.plus(expiresInSeconds.toDuration(DurationUnit.SECONDS))
+        val expireAt = issuedAt.plus(expiresInSeconds.toDuration(DurationUnit.SECONDS))
 
         return TokenClaims(
             issuer = issuer,
             subject = subject,
             audience = audience,
-            expiration = expiration.toString(),
+            expiration = expireAt.toString(),
             notBefore = notBefore?.toString(),
             issuedAt = issuedAt.toString(),
             tokenId = tokenId,

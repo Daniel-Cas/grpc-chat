@@ -26,8 +26,8 @@ class AuthInterceptor(
         private const val BEARER_PREFIX = "Bearer "
 
         private val PUBLIC_METHODS = setOf(
-            "auth.AuthService/Login",
-            "auth.AuthService/RefreshToken"
+            "auth.v1.AuthService/login",
+            "auth.v1.AuthService/refreshToken"
         )
     }
 
@@ -43,19 +43,18 @@ class AuthInterceptor(
             return next.startCall(call, headers)
         }
 
-        try {
+        return try {
             val token = extractToken(headers)
             val claims = validateToken(token)
 
             val context = Context.current().withValue(CLAIMS_CONTEXT_KEY, claims)
 
-            return Contexts.interceptCall(context, call, headers, next)
-
+            Contexts.interceptCall(context, call, headers, next)
         } catch (e: Exception) {
             logger.warn("Auth failed for $methodName: ${e.message}")
             call.close(Status.UNAUTHENTICATED.withDescription(e.message), Metadata())
 
-            return object : ServerCall.Listener<ReqT>() {}
+            object : ServerCall.Listener<ReqT>() {}
         }
     }
 
@@ -78,11 +77,7 @@ class AuthInterceptor(
             val publicKey = publicKeyBase64.let { KeyManager.publicKeyFromBase64(it) }
             pasetoService.validatePublicToken(token, publicKey)
         }
+
         else -> throw StatusException(Status.UNAUTHENTICATED.withDescription("Invalid token format"))
     }
 }
-
-fun Context.getClaims(): TokenClaims? = AuthInterceptor.CLAIMS_CONTEXT_KEY.get(this)
-
-fun Context.requireClaims(): TokenClaims =
-    getClaims() ?: throw StatusException(Status.UNAUTHENTICATED.withDescription("No authentication context"))

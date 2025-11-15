@@ -1,5 +1,6 @@
 package com.castle.domain.dto.auth
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import kotlin.time.Clock
@@ -25,6 +26,8 @@ data class TokenClaims(
     fun hasAllRoles(vararg roles: String) = roles.all { it in roles }
     fun hasAnyPermission(vararg perms: String) = perms.any { it in permissions }
     fun hasAllPermissions(vararg perms: String) = perms.all { it in permissions }
+    @JsonIgnore
     fun isExpired() = Clock.System.now() > Instant.parse(expiration)
+    @JsonIgnore
     fun isNotYetValid() = notBefore?.let { Clock.System.now() < Instant.parse(it) } ?: false
 }
