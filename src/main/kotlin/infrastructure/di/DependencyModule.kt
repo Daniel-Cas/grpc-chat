@@ -8,15 +8,15 @@ import com.castle.application.service.chat.ChatService
 import com.castle.infrastructure.verticle.grpc.interceptor.AuthInterceptor
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.vertx.core.json.JsonObject
+import io.vertx.core.json.jackson.DatabindCodec
 
 object DependencyModule {
-
     fun initialize(config: JsonObject) {
         val authConfig = config.getJsonObject("auth").getJsonObject("paseto")
         val symmetricKey = authConfig.getString("symmetric-key")
 
         ServiceRegistry {
-            single { ObjectMapper().apply { findAndRegisterModules() } }
+            single { DatabindCodec.mapper() }
 
             single {
                 PasetoService(
