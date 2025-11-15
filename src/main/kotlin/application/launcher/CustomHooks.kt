@@ -1,14 +1,24 @@
 package com.castle.application.launcher
 
+import com.castle.infrastructure.config.ConfigLoader
+import com.castle.infrastructure.di.DependencyModule
 import com.castle.infrastructure.verticle.factory.CustomVerticleFactory
 import io.vertx.core.internal.logging.LoggerFactory
 import io.vertx.core.json.JsonObject
 import io.vertx.launcher.application.HookContext
 import io.vertx.launcher.application.VertxApplicationHooks
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.future.asCompletableFuture
+import java.util.concurrent.Executors
+import kotlin.coroutines.CoroutineContext
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-class CustomHooks : VertxApplicationHooks {
+class CustomHooks(
+    private val hookDispatcher: CoroutineContext = Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher(),
+) : VertxApplicationHooks {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     @OptIn(ExperimentalTime::class)
@@ -39,8 +49,14 @@ class CustomHooks : VertxApplicationHooks {
     @OptIn(ExperimentalTime::class)
     override fun afterVertxStarted(context: HookContext?) {
         logger.info("[AFTER_VERTX_STARTED] Registering Verticle factory")
+        val vertx = context?.vertx() ?: throw RuntimeException("[AFTER_VERTX_STARTED] Vertx unavailable")
+        val config = CoroutineScope(hookDispatcher).async { ConfigLoader(vertx) }.asCompletableFuture().get()
 
-        context?.vertx()?.registerVerticleFactory(CustomVerticleFactory())
+        vertx.sharedData().getLocalMap<String, JsonObject>("app.config")["config"] = config
+
+        DependencyModule.initialize(config)
+
+        context.vertx()?.registerVerticleFactory(CustomVerticleFactory())
 
         logger.info("[AFTER_VERTX_STARTED] Verticle factory registered ${Clock.System.now()}")
 
@@ -50,6 +66,10 @@ class CustomHooks : VertxApplicationHooks {
     @OptIn(ExperimentalTime::class)
     override fun beforeDeployingVerticle(context: HookContext?) {
         logger.info("[BEFORE_DEPLOYING_VERTICLE] Deploying verticle at: ${Clock.System.now()}")
+        val vertx = context?.vertx() ?: throw RuntimeException("[AFTER_VERTX_STARTED] Vertx unavailable")
+
+        val config = vertx.sharedData().getLocalMap<String, JsonObject>("app.config")["config"]
+        context.deploymentOptions().config = config
 
         super.beforeDeployingVerticle(context)
     }

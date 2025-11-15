@@ -28,7 +28,7 @@ class ChatService(
                     request.hasConnect() -> {
                         logger.info("Connect request: ${request.connect.userId}")
                         val userExists = userService.existsUserById(request.connect.userId)
-                        val userSession = if (userExists) Uuid.Companion.random().toString() else ""
+                        val userSession = if (userExists) Uuid.random().toString() else ""
 
                         emit(
                             serverMessage {

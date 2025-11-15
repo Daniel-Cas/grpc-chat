@@ -1,12 +1,9 @@
 package com.castle.infrastructure.verticle.grpc
 
 import com.castle.application.service.chat.ChatService
-import com.castle.application.service.UserService
 import com.castle.application.service.auth.AuthService
-import com.castle.application.service.auth.KeyManager
-import com.castle.application.service.auth.PasetoService
+import com.castle.infrastructure.di.ServiceRegistry
 import com.castle.infrastructure.verticle.grpc.interceptor.AuthInterceptor
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.grpc.CompressorRegistry
 import io.grpc.DecompressorRegistry
 import io.grpc.Server
@@ -18,32 +15,15 @@ import java.util.concurrent.TimeUnit
 
 class GrpcVerticle : CoroutineVerticle() {
     private val logger = LoggerFactory.getLogger(this::class.java)
-    private val defaultPort: Int = 9090
-
     private lateinit var grpcServer: Server
 
     override suspend fun start() = try {
-        val port = config.getInteger("port", defaultPort)
+        val port = config.getJsonObject("grpc").getInteger("port", 9090)
 
-        val userService = UserService()
-        val symmetricKey = KeyManager.symmetricKeyFromBase64("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=")
-        val publicKeyBase64 = "MCowBQYDK2VwAyEAXrJSLf9z8Y8pN3qK5mH2wT1vR4xE6nU9cF7bA8sD2gI="
-        val pasetoService = PasetoService(
-            issuer = "grpc-chat",
-            audience = "grpc-chat-api",
-            objectMapper = ObjectMapper().apply {
-                findAndRegisterModules()
-            }
-        )
-        val authInterceptor = AuthInterceptor(
-            pasetoService = pasetoService,
-            symmetricKey = symmetricKey,
-            publicKeyBase64 = publicKeyBase64,
-        )
         grpcServer = ServerBuilder.forPort(port)
-            .intercept(authInterceptor)
-            .addService(ChatService(userService))
-            .addService(AuthService())
+            .intercept(ServiceRegistry.get<AuthInterceptor>())
+            .addService(ServiceRegistry.get<ChatService>())
+            .addService(ServiceRegistry.get<AuthService>())
             .addService(ProtoReflectionService.newInstance())
             .keepAliveTime(30, TimeUnit.SECONDS)
             .keepAliveTimeout(5, TimeUnit.SECONDS)

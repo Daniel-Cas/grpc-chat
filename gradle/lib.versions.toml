@@ -16,10 +16,12 @@ coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", ve
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 
 # vertx
+vertx-config = { module = "io.vertx:vertx-config", version.ref = "vertx" }
+vertx-config-yaml = { module = "io.vertx:vertx-config-yaml", version.ref = "vertx" }
 vertx-core = { module = "io.vertx:vertx-core", version.ref = "vertx" }
+vertx-coroutines = { module = "io.vertx:vertx-lang-kotlin-coroutines", version.ref = "vertx" }
 vertx-grpc-server = { module = "io.vertx:vertx-grpcio-server", version.ref = "vertx" }
 vertx-launcher-application = { module = "io.vertx:vertx-launcher-application", version.ref = "vertx" }
-vertx-coroutines = { module = "io.vertx:vertx-lang-kotlin-coroutines", version.ref = "vertx" }
 vertx-pg-client = { module = "io.vertx:vertx-pg-client", version.ref = "vertx" }
 
 # gRPC Core
@@ -50,7 +52,15 @@ jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin"
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
 [bundles]
-vertx = ["vertx-core", "vertx-grpc-server", "vertx-launcher-application", "vertx-coroutines", "vertx-pg-client"]
+vertx = [
+    "vertx-config",
+    "vertx-config-yaml",
+    "vertx-core",
+    "vertx-grpc-server",
+    "vertx-launcher-application",
+    "vertx-coroutines",
+    "vertx-pg-client",
+]
 grpc = ["grpc-netty-shaded", "grpc-protobuf", "grpc-services", "grpc-kotlin-stub"]
 protobuf = ["google-protobuf-kotlin"]
 testing = ["coroutines-test", "kotlin-test"]
