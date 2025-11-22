@@ -2,6 +2,7 @@ package com.castle.shared
 
 import com.castle.domain.dto.auth.TokenClaims
 import com.castle.infrastructure.config.EnvironmentReader
+import com.castle.infrastructure.config.model.AppConfig
 import com.castle.infrastructure.verticle.grpc.interceptor.AuthInterceptor
 import io.grpc.Context
 import io.grpc.Status
@@ -51,3 +52,5 @@ fun String.resolveEnvironmentVars(): String = ENVIRONMENT_REGEX.replace(this) { 
             "Environment var $environmentVar needed as config was not defined and no default provided."
         )
 }
+
+fun JsonObject.toAppConfig(): AppConfig = mapTo(AppConfig::class.java)
