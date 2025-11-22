@@ -1,15 +1,28 @@
 auth:
   paseto:
-    audience: "${PASETO_AUDIENCE:grpc-chat-api}"
+    audience: ${PASETO_AUDIENCE:grpc-chat-api}
     issuer: ${PASETO_ISSUER:grpc-chat}
     public-key: ${PASETO_PUBLIC_KEY:MCowBQYDK2VwAyEAXrJSLf9z8Y8pN3qK5mH2wT1vR4xE6nU9cF7bA8sD2gI=}
     symmetric-key: ${PASETO_SYMMETRIC_KEY:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=}
 
+security:
+  crypto:
+    algorithm: AES
+    secretKey: WB1lIfxFPGgHbei5yOMcC8PLViropgBrrKIit82AH0Q=
 
 database:
   postgres:
+    connection-timeout: 5000
+    database: chat
     host: localhost
+    idle-timeout: 300
+    password: postgres
+    pool-max-size: 10
     port: 5432
+    reconnect-attempts: 4
+    reconnect-interval: 5000
+    url: jdbc:postgresql://localhost:5432/chat
+    user: postgres
 
 grpc:
   port: 9090

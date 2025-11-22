@@ -2,6 +2,7 @@ package com.castle.infrastructure.verticle.grpc
 
 import com.castle.application.service.chat.ChatService
 import com.castle.application.service.auth.AuthService
+import com.castle.infrastructure.db.postgres.Flyway
 import com.castle.infrastructure.di.ServiceRegistry
 import com.castle.infrastructure.verticle.grpc.interceptor.AuthInterceptor
 import io.grpc.CompressorRegistry
@@ -19,6 +20,8 @@ class GrpcVerticle : CoroutineVerticle() {
 
     override suspend fun start() = try {
         val port = config.getJsonObject("grpc").getInteger("port", 9090)
+
+        ServiceRegistry.get<Flyway>().migrate()
 
         grpcServer = ServerBuilder.forPort(port)
             .intercept(ServiceRegistry.get<AuthInterceptor>())

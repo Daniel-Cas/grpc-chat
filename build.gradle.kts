@@ -13,12 +13,15 @@ version = "1.0-SNAPSHOT"
 
 dependencies {
     implementation(libraries.bundles.vertx)
+    implementation(libraries.bundles.flyway)
     implementation(libraries.bundles.grpc)
     implementation(libraries.bundles.protobuf)
     implementation(libraries.coroutines.core)
     implementation(libraries.paseto4j)
     implementation(libraries.bouncy.castle4j)
     implementation(libraries.jackson.kotlin)
+
+    runtimeOnly(libraries.bundles.postgresql)
 
     testImplementation(libraries.bundles.testing)
 }

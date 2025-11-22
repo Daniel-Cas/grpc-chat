@@ -1,12 +1,14 @@
 [versions]
 bouncy-castle = "1.78"
 coroutines = "1.9.0"
+flyway = "11.17.1"
 grpc-kotlin = "1.4.1"
 grpc-protobuf = "1.68.1"
 google-protobuf = "0.9.4"
 google-protobuf-kotlin = "4.28.3"
 jackson = "2.15.2"
 paseto4j = "2024.3"
+postgresql = "42.7.8"
 kotlin = "2.2.0"
 vertx = "5.0.4"
 
@@ -23,6 +25,10 @@ vertx-coroutines = { module = "io.vertx:vertx-lang-kotlin-coroutines", version.r
 vertx-grpc-server = { module = "io.vertx:vertx-grpcio-server", version.ref = "vertx" }
 vertx-launcher-application = { module = "io.vertx:vertx-launcher-application", version.ref = "vertx" }
 vertx-pg-client = { module = "io.vertx:vertx-pg-client", version.ref = "vertx" }
+
+# flyway
+flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flyway"}
+flyway-postgres = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
 
 # gRPC Core
 grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc-protobuf" }
@@ -41,6 +47,9 @@ protoc-gen-grpc-kotlin = { module = "io.grpc:protoc-gen-grpc-kotlin", version.re
 
 # Paseto
 paseto4j = { module = "io.github.nbaars:paseto4j-version4", version.ref = "paseto4j" }
+
+# Postgresql
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 
 # Bouncy Castle
 bouncy-castle4j = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncy-castle" }
@@ -61,7 +70,9 @@ vertx = [
     "vertx-coroutines",
     "vertx-pg-client",
 ]
+flyway = ["flyway-core", "flyway-postgres"]
 grpc = ["grpc-netty-shaded", "grpc-protobuf", "grpc-services", "grpc-kotlin-stub"]
+postgresql = ["postgresql"]
 protobuf = ["google-protobuf-kotlin"]
 testing = ["coroutines-test", "kotlin-test"]
 

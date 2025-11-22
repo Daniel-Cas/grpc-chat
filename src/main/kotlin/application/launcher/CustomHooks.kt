@@ -1,8 +1,12 @@
 package com.castle.application.launcher
 
 import com.castle.infrastructure.config.ConfigLoader
+import com.castle.infrastructure.config.model.AppConfig
+import com.castle.infrastructure.db.postgres.Flyway
 import com.castle.infrastructure.di.DependencyModule
+import com.castle.infrastructure.di.ServiceRegistry
 import com.castle.infrastructure.verticle.factory.CustomVerticleFactory
+import com.castle.shared.toAppConfig
 import io.vertx.core.internal.logging.LoggerFactory
 import io.vertx.core.json.JsonObject
 import io.vertx.launcher.application.HookContext
@@ -49,12 +53,12 @@ class CustomHooks(
     @OptIn(ExperimentalTime::class)
     override fun afterVertxStarted(context: HookContext?) {
         logger.info("[AFTER_VERTX_STARTED] Registering Verticle factory")
+        DependencyModule.initializeMapper()
+
         val vertx = context?.vertx() ?: throw RuntimeException("[AFTER_VERTX_STARTED] Vertx unavailable")
-        val config = CoroutineScope(hookDispatcher).async { ConfigLoader(vertx) }.asCompletableFuture().get()
+        val configJson = CoroutineScope(hookDispatcher).async { ConfigLoader(vertx) }.asCompletableFuture().get()
 
-        vertx.sharedData().getLocalMap<String, JsonObject>("app.config")["config"] = config
-
-        DependencyModule.initialize(config)
+        DependencyModule.initialize(configJson.toAppConfig(), vertx)
 
         context.vertx()?.registerVerticleFactory(CustomVerticleFactory())
 
@@ -66,10 +70,9 @@ class CustomHooks(
     @OptIn(ExperimentalTime::class)
     override fun beforeDeployingVerticle(context: HookContext?) {
         logger.info("[BEFORE_DEPLOYING_VERTICLE] Deploying verticle at: ${Clock.System.now()}")
-        val vertx = context?.vertx() ?: throw RuntimeException("[AFTER_VERTX_STARTED] Vertx unavailable")
-
-        val config = vertx.sharedData().getLocalMap<String, JsonObject>("app.config")["config"]
-        context.deploymentOptions().config = config
+        
+        val config = ServiceRegistry.get<AppConfig>()
+        context?.deploymentOptions()?.config = JsonObject.mapFrom(config)
 
         super.beforeDeployingVerticle(context)
     }
