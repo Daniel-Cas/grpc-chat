@@ -1,7 +1,8 @@
 package com.castle.infrastructure.verticle.grpc
 
-import com.castle.application.service.chat.ChatService
-import com.castle.application.service.auth.AuthService
+import com.castle.infrastructure.verticle.grpc.service.ChatService
+import com.castle.infrastructure.verticle.grpc.service.AuthService
+import com.castle.infrastructure.verticle.grpc.service.UserService
 import com.castle.infrastructure.db.postgres.Flyway
 import com.castle.infrastructure.di.ServiceRegistry
 import com.castle.infrastructure.verticle.grpc.interceptor.AuthInterceptor
@@ -10,7 +11,7 @@ import io.grpc.DecompressorRegistry
 import io.grpc.Server
 import io.grpc.ServerBuilder
 import io.grpc.protobuf.services.ProtoReflectionService
-import io.vertx.core.internal.logging.LoggerFactory
+import org.slf4j.LoggerFactory
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 import java.util.concurrent.TimeUnit
 
@@ -27,6 +28,7 @@ class GrpcVerticle : CoroutineVerticle() {
             .intercept(ServiceRegistry.get<AuthInterceptor>())
             .addService(ServiceRegistry.get<ChatService>())
             .addService(ServiceRegistry.get<AuthService>())
+            .addService(ServiceRegistry.get<UserService>())
             .addService(ProtoReflectionService.newInstance())
             .keepAliveTime(30, TimeUnit.SECONDS)
             .keepAliveTimeout(5, TimeUnit.SECONDS)

@@ -1,51 +1,63 @@
-package com.castle.application.service.auth
+package com.castle.infrastructure.verticle.grpc.service
 
 import auth.v1.Auth
 import auth.v1.AuthServiceGrpcKt
 import auth.v1.loginResponse
 import auth.v1.validateResponse
+import com.castle.application.security.crypto.Cipher
+import com.castle.application.service.auth.PasetoService
+import com.castle.application.usecase.UserUseCase
 import com.castle.domain.dto.auth.TokenFooter
 import io.grpc.Status
-import io.vertx.core.internal.logging.LoggerFactory
 import kotlinx.coroutines.asCoroutineDispatcher
+import org.slf4j.LoggerFactory
 import types.v1.Enums
 import java.security.KeyPair
 import java.util.concurrent.Executors
 import kotlin.time.Clock
+import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
+import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
 
 class AuthService(
+    private val cipher: Cipher,
     private val keyPair: KeyPair,
     private val pasetoService: PasetoService,
     private val symmetricKey: ByteArray,
+    private val userUseCase: UserUseCase,
 ) : AuthServiceGrpcKt.AuthServiceCoroutineImplBase(
     coroutineContext = Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher(),
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     @OptIn(ExperimentalTime::class)
-    override suspend fun login(request: Auth.LoginRequest): Auth.LoginResponse {
-        logger.info("Logging into $request")
+    override suspend fun login(request: Auth.LoginRequest): Auth.LoginResponse = loginResponse {
+        logger.info("[LOGIN] username: {}", request.username)
+        val invalidCredentials = Status.UNAUTHENTICATED.withDescription("Invalid credentials").asException()
+
         require(request.username.isNotBlank()) { "username required" }
         require(request.password.isNotBlank()) { "password required" }
 
-        val userId = 1.toString()
+        val user = userUseCase.getByUsername(request.username) ?: throw invalidCredentials
+
+        if (!cipher.verify(request.password, user.password)) {
+            throw invalidCredentials
+        }
+
         val roles = emptyList<String>()
         val permissions = emptyList<String>()
         val (accessToken, refreshToken) = when (request.tokenType) {
-            Enums.TokenType.LOCAL -> generateLocalTokens(userId, roles, permissions)
-            Enums.TokenType.PUBLIC -> generatePublicTokens(userId, roles, permissions)
+            Enums.TokenType.LOCAL -> generateLocalTokens(user.id.toString(), roles, permissions)
+            Enums.TokenType.PUBLIC -> generatePublicTokens(user.id.toString(), roles, permissions)
 
-            else -> throw Status.INVALID_ARGUMENT.withDescription("TokenType inválido").asException()
+            else -> throw Status.INVALID_ARGUMENT.withDescription("Invalid token type").asException()
         }
 
-        return loginResponse {
-            this.accessToken = accessToken
-            this.refreshToken = refreshToken
-            expiresIn = Clock.System.now().toEpochMilliseconds()
-            tokenType = Enums.TokenType.LOCAL.toString()
-        }
+        this.accessToken = accessToken
+        this.refreshToken = refreshToken
+        expiresIn = Clock.System.now().plus(900L.toDuration(DurationUnit.SECONDS)).toEpochMilliseconds()
+        tokenType = Enums.TokenType.LOCAL.toString()
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -80,7 +92,7 @@ class AuthService(
             subject = userId,
             roles = roles,
             permissions = permissions,
-            ttlSeconds = PasetoService.DEFAULT_ACCESS_TOKEN_TTL,
+            ttlSeconds = PasetoService.Companion.DEFAULT_ACCESS_TOKEN_TTL,
             privateKey = keyPair.private,
             tokenFooter = footer,
         )
@@ -89,7 +101,7 @@ class AuthService(
             subject = userId,
             roles = emptyList(),
             permissions = emptyList(),
-            ttlSeconds = PasetoService.DEFAULT_REFRESH_TOKEN_TTL,
+            ttlSeconds = PasetoService.Companion.DEFAULT_REFRESH_TOKEN_TTL,
             privateKey = keyPair.private,
         )
 

@@ -10,7 +10,9 @@ jackson = "2.15.2"
 paseto4j = "2024.3"
 postgresql = "42.7.8"
 kotlin = "2.2.0"
+slf4j = "2.1.0-alpha1"
 vertx = "5.0.4"
+logback = "1.5.21"
 
 [libraries]
 # coroutines
@@ -25,6 +27,11 @@ vertx-coroutines = { module = "io.vertx:vertx-lang-kotlin-coroutines", version.r
 vertx-grpc-server = { module = "io.vertx:vertx-grpcio-server", version.ref = "vertx" }
 vertx-launcher-application = { module = "io.vertx:vertx-launcher-application", version.ref = "vertx" }
 vertx-pg-client = { module = "io.vertx:vertx-pg-client", version.ref = "vertx" }
+vertx-redis-client = { module = "io.vertx:vertx-redis-client", version.ref = "vertx" }
+
+# flyway
+flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flyway"}
+flyway-postgres = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
 
 # flyway
 flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flyway"}
@@ -60,6 +67,11 @@ jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin"
 # Testing
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
+# Logger
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+
+
 [bundles]
 vertx = [
     "vertx-config",
@@ -69,12 +81,15 @@ vertx = [
     "vertx-launcher-application",
     "vertx-coroutines",
     "vertx-pg-client",
+    "vertx-redis-client",
 ]
 flyway = ["flyway-core", "flyway-postgres"]
 grpc = ["grpc-netty-shaded", "grpc-protobuf", "grpc-services", "grpc-kotlin-stub"]
 postgresql = ["postgresql"]
 protobuf = ["google-protobuf-kotlin"]
 testing = ["coroutines-test", "kotlin-test"]
+slf4j = ["slf4j-api"]
+logback = ["logback-classic"]
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

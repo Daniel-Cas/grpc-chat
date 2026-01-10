@@ -3,48 +3,79 @@ syntax = "proto3";
 package chat.v1;
 
 import "type/v1/types.proto";
+import "type/v1/enums.proto";
 
 service ChatService {
-  rpc StreamChat(stream ClientMessage) returns (stream ServerMessage);
+  rpc Stream(stream ChatStreamRequest) returns (stream ChatStreamResponse);
+  rpc CreateChat(CreateChatRequest) returns (CreateChatResponse);
 }
 
-message ClientMessage {
-  oneof message {
-    Connect connect = 1;
-    SendText send_text = 2;
+message UserProfile {
+  int64 id = 1;
+  string username = 2;
+  string avatar = 3;
+}
+
+message ChatMessage {
+  int64 id = 1;
+  int64 chat_id = 2;
+  UserProfile sender = 3;
+  string content = 4;
+  types.v1.Timestamp created_at = 5;
+}
+
+message ChatStreamRequest {
+  oneof request {
+    SubscriptionRequest subscription = 1;
+    MessageSentRequest send_message = 2;
   }
 }
 
-message Connect {
-  string user_id = 1;
+message SubscriptionRequest {
+  int64 chat_id = 1;
 }
 
-message SendText {
-  string message_id = 1;
-  string content = 2;
+message MessageSentRequest {
+  int64 client_message_id = 1;
+  int64 chat_id = 2;
+  int64 sender_id = 3;
+  string content = 4;
 }
 
-message ServerMessage {
-  oneof message {
-    Connected connected = 1;
-    TextReceived text_received = 2;
-    Error error = 3;
+message SubscriptionResponse {
+  bool subscribed = 1;
+  repeated UserProfile members = 2;
+}
+
+message MessageCreatedEvent {
+  string client_message_id = 1;
+  ChatMessage message = 2;
+}
+
+message CreateChatRequest {
+  types.v1.ChatType type = 1;
+  types.v1.ChatVisibility visibility = 2;
+  repeated int64 member_ids = 3;
+  string name = 4;
+  string description = 5;
+}
+
+message CreateChatResponse {
+  bool created = 1;
+  int64 chat_id = 2;
+  repeated ChatMemberResponse members = 3;
+  types.v1.ChatType type = 4;
+  types.v1.Timestamp created_at = 5;
+}
+
+message ChatMemberResponse {
+  int64 user_id = 1;
+  types.v1.ChatRole role = 2;
+}
+
+message ChatStreamResponse {
+  oneof response {
+    SubscriptionResponse subscription = 1;
+    MessageCreatedEvent message_created = 2;
   }
-}
-
-message Connected {
-  bool success = 1;
-  string session_id = 2;
-}
-
-message TextReceived {
-  string message_id = 1;
-  string sender_id = 2;
-  string content = 3;
-  types.v1.Timestamp timestamp = 4;
-}
-
-message Error {
-  string code = 1;
-  string message = 2;
 }

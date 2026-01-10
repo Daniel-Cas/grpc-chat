@@ -2,7 +2,7 @@ package com.castle
 
 import com.castle.application.launcher.CustomHooks
 import com.castle.application.launcher.CustomLauncher
-import io.vertx.core.internal.logging.LoggerFactory
+import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("com.castle.Application")
 

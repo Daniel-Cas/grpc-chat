@@ -2,8 +2,11 @@ CREATE TABLE users(
     id BIGSERIAL PRIMARY KEY,
     username VARCHAR NOT NULL,
     password VARCHAR NOT NULL,
+    avatar TEXT,
+    email VARCHAR NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
 
-    UNIQUE (username)
+    UNIQUE (username),
+    UNIQUE (email)
 )

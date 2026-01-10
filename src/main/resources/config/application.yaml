@@ -24,6 +24,17 @@ database:
     url: jdbc:postgresql://localhost:5432/chat
     user: postgres
 
+  redis:
+    connection-timeout: 5000
+    database: 0
+    host: localhost
+    port: 6379
+    password: redispass
+    user: default
+    reconnect-attempts: 4
+    reconnect-interval: 5000
+    url: redis://default:redispass@localhost:6379/0
+
 grpc:
   port: 9090
 

@@ -1,15 +1,26 @@
 package com.castle.infrastructure.di
 
 import com.castle.application.security.crypto.Cipher
-import com.castle.application.service.UserService
-import com.castle.application.service.auth.AuthService
 import com.castle.application.service.auth.KeyManager
 import com.castle.application.service.auth.PasetoService
-import com.castle.application.service.chat.ChatService
+import com.castle.application.service.user.ChatUseCase
+import com.castle.application.usecase.ChatMemberUseCase
+import com.castle.application.usecase.CreateChatUseCase
+import com.castle.application.usecase.CreateMessageUseCase
+import com.castle.application.usecase.UserUseCase
 import com.castle.infrastructure.config.model.AppConfig
 import com.castle.infrastructure.db.postgres.Flyway
 import com.castle.infrastructure.db.postgres.Postgresql
+import com.castle.infrastructure.db.postgres.repository.ChatMemberRepository
+import com.castle.infrastructure.db.postgres.repository.ChatRepository
+import com.castle.infrastructure.db.postgres.repository.MessageRepository
+import com.castle.infrastructure.db.postgres.repository.UserRepository
+import com.castle.infrastructure.db.redis.Redis
+import com.castle.infrastructure.db.redis.repository.RedisChatRepository
 import com.castle.infrastructure.verticle.grpc.interceptor.AuthInterceptor
+import com.castle.infrastructure.verticle.grpc.service.AuthService
+import com.castle.infrastructure.verticle.grpc.service.ChatService
+import com.castle.infrastructure.verticle.grpc.service.UserService
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.vertx.core.Vertx
@@ -27,6 +38,7 @@ object DependencyModule {
             single { config }
             single { Flyway(databaseConfig) }
             single { Postgresql(databaseConfig.postgres, vertx) }
+            single { Redis(databaseConfig.redis, vertx) }
             single {
                 Cipher(
                     algorithm = cryptoConfig.algorithm,
@@ -49,17 +61,28 @@ object DependencyModule {
                 )
             }
 
+            single { UserRepository(get<Postgresql>()) }
+            single { UserUseCase(get<UserRepository>()) }
+            single { UserService(get<Cipher>(), get<UserUseCase>()) }
+            single { ChatRepository(get<Postgresql>()) }
+            single { ChatUseCase(get<ChatRepository>()) }
+            single { ChatMemberRepository(get<Postgresql>()) }
+            single { ChatMemberUseCase(get<ChatMemberRepository>()) }
+            single { RedisChatRepository(get()) }
+            single { CreateChatUseCase(get()) }
+            single { MessageRepository(get()) }
+            single { CreateMessageUseCase(get()) }
+            single { ChatService(get<ChatMemberUseCase>(), get(), get(), get()) }
+
             single {
                 AuthService(
+                    cipher = get<Cipher>(),
                     keyPair = KeyManager.generateAsymmetricKeyPair(),
                     pasetoService = get<PasetoService>(),
                     symmetricKey = KeyManager.symmetricKeyFromBase64(symmetricKey),
+                    userUseCase = get<UserUseCase>(),
                 )
             }
-
-            single { UserService() }
-
-            single { ChatService(get<UserService>()) }
         }
     }
 

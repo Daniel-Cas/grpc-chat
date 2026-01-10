@@ -1,10 +1,11 @@
 package com.castle.infrastructure.verticle.http
 
 import io.vertx.core.Promise
-import io.vertx.core.internal.logging.LoggerFactory
+import org.slf4j.LoggerFactory
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 
-class ApiVerticle : CoroutineVerticle() {
+class ApiVerticle : CoroutineVerticle(
+) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     override fun start(startFuture: Promise<Void>?) {

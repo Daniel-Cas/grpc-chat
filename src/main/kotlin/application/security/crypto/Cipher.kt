@@ -19,7 +19,7 @@ class Cipher(
         secretKey = SecretKeySpec(keyBytes, algorithm)
     }
 
-    fun encrypt(plainText: String, cipherText: ByteArray): String {
+    fun encrypt(plainText: String): String {
         val initializationVector = ByteArray(12).apply {
             SecureRandom().nextBytes(this)
         }
@@ -41,4 +41,14 @@ class Cipher(
 
         return cipher.doFinal(encryptedData).toString(Charsets.UTF_8)
     }
+
+    fun verify(plainText: String, encryptedPassword: String): Boolean = try {
+        val decrypted = decrypt(encryptedPassword.toByteArray())
+
+        decrypted == plainText
+    } catch (e: Exception) {
+
+        false
+    }
+
 }

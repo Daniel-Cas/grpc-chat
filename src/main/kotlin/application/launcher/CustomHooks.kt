@@ -2,12 +2,11 @@ package com.castle.application.launcher
 
 import com.castle.infrastructure.config.ConfigLoader
 import com.castle.infrastructure.config.model.AppConfig
-import com.castle.infrastructure.db.postgres.Flyway
 import com.castle.infrastructure.di.DependencyModule
 import com.castle.infrastructure.di.ServiceRegistry
 import com.castle.infrastructure.verticle.factory.CustomVerticleFactory
 import com.castle.shared.toAppConfig
-import io.vertx.core.internal.logging.LoggerFactory
+import org.slf4j.LoggerFactory
 import io.vertx.core.json.JsonObject
 import io.vertx.launcher.application.HookContext
 import io.vertx.launcher.application.VertxApplicationHooks

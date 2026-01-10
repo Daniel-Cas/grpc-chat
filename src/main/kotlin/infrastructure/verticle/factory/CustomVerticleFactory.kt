@@ -4,7 +4,7 @@ import com.castle.infrastructure.verticle.grpc.GrpcVerticle
 import com.castle.infrastructure.verticle.http.ApiVerticle
 import io.vertx.core.Deployable
 import io.vertx.core.Promise
-import io.vertx.core.internal.logging.LoggerFactory
+import org.slf4j.LoggerFactory
 import io.vertx.core.spi.VerticleFactory
 import java.util.concurrent.Callable
 

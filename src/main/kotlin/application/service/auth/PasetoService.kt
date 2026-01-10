@@ -5,7 +5,7 @@ import com.castle.domain.dto.auth.TokenFooter
 import com.castle.domain.dto.builder.tokenClaims
 import com.castle.shared.extractFooter
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.vertx.core.internal.logging.LoggerFactory
+import org.slf4j.LoggerFactory
 import org.paseto4j.commons.PrivateKey as PasetoPrivateKey
 import org.paseto4j.commons.PublicKey as PasetoPublicKey
 import org.paseto4j.commons.SecretKey
@@ -31,7 +31,7 @@ class PasetoService(
     private val objectMapper: ObjectMapper,
 ) {
     companion object {
-        const val DEFAULT_ACCESS_TOKEN_TTL = 900L
+        const val DEFAULT_ACCESS_TOKEN_TTL = 900_000L
         const val DEFAULT_REFRESH_TOKEN_TTL = 604_800L
     }
 
@@ -47,9 +47,7 @@ class PasetoService(
         tokenFooter: TokenFooter? = null,
         implicitAssertion: String = "",
     ): String = try {
-        require(subject.isNotBlank()) { "Subject no puede estar vacío" }
-        require(ttlSeconds > 0) { "TTL debe ser positivo" }
-        require(symmetricKey.size == 32) { "La clave debe ser de 32 bytes" }
+        validateLocalToken(subject, ttlSeconds, symmetricKey)
 
         val claims = tokenClaims {
             issuer = this@PasetoService.issuer
@@ -72,6 +70,16 @@ class PasetoService(
     } catch (e: Exception) {
         logger.error("Error creando token v4.local", e)
         throw Exception("Error al crear token local", e)
+    }
+
+    private fun validateLocalToken(
+        subject: String,
+        ttlSeconds: Long,
+        symmetricKey: ByteArray,
+    ) {
+        require(subject.isNotBlank()) { "Subject cannot be blank" }
+        require(ttlSeconds > 0) { "TTL must be positive integer" }
+        require(symmetricKey.size == 32) { "The symmetric key cannot be blank" }
     }
 
     fun validateLocalToken(

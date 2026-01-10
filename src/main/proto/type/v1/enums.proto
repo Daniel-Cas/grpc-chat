@@ -6,3 +6,20 @@ enum TokenType {
   LOCAL = 0;
   PUBLIC = 1;
 }
+
+enum ChatType {
+  DIRECT = 0;
+  GROUP = 1;
+  ROOM = 2;
+}
+
+enum ChatVisibility {
+  PRIVATE = 0;
+  VISIBLE = 1;
+}
+
+enum ChatRole {
+  ADMIN = 0;
+  MEMBER = 1;
+  OWNER = 2;
+}
