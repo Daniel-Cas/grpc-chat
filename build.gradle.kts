@@ -20,6 +20,8 @@ dependencies {
     implementation(libraries.paseto4j)
     implementation(libraries.bouncy.castle4j)
     implementation(libraries.jackson.kotlin)
+    implementation(libraries.bundles.slf4j)
+    implementation(libraries.bundles.logback)
 
     runtimeOnly(libraries.bundles.postgresql)
 

@@ -25,7 +25,10 @@ data class PasetoConfig(
     @param:JsonProperty("symmetric-key") val symmetricKey: String,
 )
 
-data class DatabaseConfig(val postgres: PostgresConfig)
+data class DatabaseConfig(
+    val postgres: PostgresConfig,
+    val redis: RedisConfig,
+)
 
 data class PostgresConfig(
     @param:JsonProperty("connection-timeout") val connectionTimeout: Int,
@@ -35,6 +38,18 @@ data class PostgresConfig(
     val password: String,
     @param:JsonProperty("pool-max-size") val poolMaxSize: Int,
     val port: Int,
+    @param:JsonProperty("reconnect-attempts") val reconnectAttempts: Int,
+    @param:JsonProperty("reconnect-interval") val reconnectInterval: Long,
+    val url: String,
+    val user: String,
+)
+
+data class RedisConfig(
+    @param:JsonProperty("connection-timeout") val connectionTimeout: Int,
+    val database: String,
+    val host: String,
+    val port: Int,
+    val password: String,
     @param:JsonProperty("reconnect-attempts") val reconnectAttempts: Int,
     @param:JsonProperty("reconnect-interval") val reconnectInterval: Long,
     val url: String,

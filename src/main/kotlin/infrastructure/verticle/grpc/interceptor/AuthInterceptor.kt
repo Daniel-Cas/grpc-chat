@@ -11,7 +11,7 @@ import io.grpc.ServerCallHandler
 import io.grpc.ServerInterceptor
 import io.grpc.Status
 import io.grpc.StatusException
-import io.vertx.core.internal.logging.LoggerFactory
+import org.slf4j.LoggerFactory
 
 class AuthInterceptor(
     private val pasetoService: PasetoService,
@@ -29,17 +29,24 @@ class AuthInterceptor(
             "auth.v1.AuthService/login",
             "auth.v1.AuthService/refreshToken"
         )
+
+        private val API_KEY_METHODS = setOf(
+            "grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo",
+            "grpc.reflection.v1.ServerReflection/ServerReflectionInfo"
+        )
     }
 
-    override fun <ReqT : Any, RespT : Any> interceptCall(
+    override fun <ReqT , RespT> interceptCall(
         call: ServerCall<ReqT, RespT>,
         headers: Metadata,
         next: ServerCallHandler<ReqT, RespT>,
     ): ServerCall.Listener<ReqT> {
-        logger.info("[INTERCEPT_CALL] Intercepting")
         val methodName = call.methodDescriptor.fullMethodName
 
-        if (methodName in PUBLIC_METHODS) {
+        logger.debug("[INTERCEPT_CALL] Intercepting {}", methodName)
+
+
+        if (methodName in PUBLIC_METHODS || methodName in API_KEY_METHODS) {
             return next.startCall(call, headers)
         }
 

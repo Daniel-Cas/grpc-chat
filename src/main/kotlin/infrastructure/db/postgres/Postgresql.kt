@@ -3,13 +3,13 @@ package com.castle.infrastructure.db.postgres
 import com.castle.infrastructure.config.model.PostgresConfig
 import com.castle.infrastructure.db.Database
 import io.vertx.core.Vertx
-import io.vertx.core.internal.logging.LoggerFactory
+import org.slf4j.LoggerFactory
 import io.vertx.pgclient.PgBuilder
 import io.vertx.pgclient.PgConnectOptions
 import io.vertx.sqlclient.Pool
 import io.vertx.sqlclient.PoolOptions
 
-class Postgresql(config: PostgresConfig, vertx: Vertx) : Database<PostgresConfig>(config, vertx) {
+class Postgresql(config: PostgresConfig, vertx: Vertx) : Database<PostgresConfig, Pool>(config, vertx) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     override fun createClient(vertx: Vertx, config: PostgresConfig): Pool {

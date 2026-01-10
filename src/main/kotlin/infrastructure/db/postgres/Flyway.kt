@@ -2,7 +2,7 @@ package com.castle.infrastructure.db.postgres
 
 import com.castle.infrastructure.config.model.DatabaseConfig
 import com.castle.infrastructure.db.Migration
-import io.vertx.core.internal.logging.LoggerFactory
+import org.slf4j.LoggerFactory
 import io.vertx.kotlin.coroutines.awaitBlocking
 import org.flywaydb.core.Flyway
 
