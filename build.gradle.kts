@@ -25,6 +25,8 @@ dependencies {
 
     runtimeOnly(libraries.bundles.postgresql)
 
+    runtimeOnly(libraries.bundles.postgresql)
+
     testImplementation(libraries.bundles.testing)
 }
 
