@@ -33,10 +33,6 @@ vertx-redis-client = { module = "io.vertx:vertx-redis-client", version.ref = "ve
 flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flyway"}
 flyway-postgres = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
 
-# flyway
-flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flyway"}
-flyway-postgres = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
-
 # gRPC Core
 grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc-protobuf" }
 grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc-protobuf" }
