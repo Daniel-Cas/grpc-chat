@@ -80,13 +80,10 @@ class ChatService(
                         this.userId = member.userId
                         role = Enums.ChatRole.valueOf(member.role.name)
                     }
-                }
-            )
+                })
             createdAt = timestamp {
-                value = Timestamp.newBuilder()
-                    .setSeconds(chat.createdAt.epochSeconds)
-                    .setNanos(chat.createdAt.nanosecondsOfSecond)
-                    .build()
+                value = Timestamp.newBuilder().setSeconds(chat.createdAt.epochSeconds)
+                    .setNanos(chat.createdAt.nanosecondsOfSecond).build()
             }
         }
     }
@@ -122,8 +119,7 @@ class ChatService(
                                         userProfile {
                                             id = it
                                         }
-                                    }
-                                )
+                                    })
                             } else {
                                 subscribed = true
                                 members.addAll(
@@ -131,33 +127,32 @@ class ChatService(
                                         userProfile {
                                             id = it
                                         }
-                                    }
-                                )
+                                    })
                             }
                         }
-                    }
-                )
+                    })
 
-                request.hasSendMessage() -> messageCreatedEvent {
-                    val clientId = request.sendMessage.clientMessageId
-                    val chatId = request.sendMessage.chatId
-                    val senderId = request.sendMessage.senderId
-                    val content = request.sendMessage.content
+                request.hasSendMessage() -> emit(
+                    chatStreamResponse {
+                        messageCreated = messageCreatedEvent {
+                            val clientId = request.sendMessage.clientMessageId
+                            val chatId = request.sendMessage.chatId
+                            val senderId = request.sendMessage.senderId
+                            val content = request.sendMessage.content
 
-                    logger.info("[CHAT] New message from client: {}", clientId)
+                            logger.info("[CHAT] New message from client: {}", clientId)
 
-                    message = chatMessage {
-                        val message = createMessageUseCase(
-                            Message(
-                                chatId = chatId,
-                                senderId = senderId,
-                                content = content,
-                            )
-                        ).getOrThrow()
 
-                        messageCreatedEvent {
+                            val message = createMessageUseCase(
+                                Message(
+                                    chatId = chatId,
+                                    senderId = senderId,
+                                    content = content,
+                                )
+                            ).getOrThrow()
+
                             clientMessageId = message.clientMessageId ?: ""
-                            chatMessage {
+                            this.message = chatMessage {
                                 id = message.id
                                 this.chatId = message.chatId
 
@@ -169,14 +164,12 @@ class ChatService(
 
                                 this.content = content
                                 createdAt = timestamp {
-                                    value = Timestamp.newBuilder()
-                                        .setSeconds(message.sentAt.epochSeconds)
-                                        .setNanos(message.sentAt.nanosecondsOfSecond)
-                                        .build()                                }
+                                    value = Timestamp.newBuilder().setSeconds(message.sentAt.epochSeconds)
+                                        .setNanos(message.sentAt.nanosecondsOfSecond).build()
+                                }
                             }
                         }
-                    }
-                }
+                    })
             }
         }
     }
